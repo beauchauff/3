@@ -19,18 +19,7 @@ except FileNotFoundError:
 
 
 class PredictionInput(BaseModel):
-    features: List[float]
-
-
-# @app.on_event("startup")
-# def startup_event():
-#     """
-#     A startup event handler. It checks if the model was loaded correctly.
-#     If not, it prints a persistent warning.
-#     """
-#     if model is None:
-#         print("WARNING: Model is not loaded. Prediction endpoints will not work.")
-#
+    features: List[str]
 
 @app.get("/health")
 def health_check():
@@ -58,7 +47,6 @@ def predict(input_data: PredictionInput):
 
     return {"sentiment": prediction}
 
-
 @app.post("/predict_proba")
 def predict_with_probability(input_data: PredictionInput):
     """
@@ -81,7 +69,7 @@ def predict_with_probability(input_data: PredictionInput):
     prob_class_1 = probabilities[0][1]
 
     return {
-        "prediction": prediction,
+        "prediction": int(prediction[0]),
         "probability_class_0": f"{prob_class_0:.4f}",
         "probability_class_1": f"{prob_class_1:.4f}"
     }
@@ -95,5 +83,5 @@ def training_example():
     """
     df = pd.read_csv('IMDB Dataset.csv')
     entry = random.randint(2,len(df))
+    return {"review": df.iat[entry,0]}
 
-    return {"review": df[entry]}
