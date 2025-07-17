@@ -22,15 +22,15 @@ class PredictionInput(BaseModel):
     features: List[float]
 
 
-@app.on_event("startup")
-def startup_event():
-    """
-    A startup event handler. It checks if the model was loaded correctly.
-    If not, it prints a persistent warning.
-    """
-    if model is None:
-        print("WARNING: Model is not loaded. Prediction endpoints will not work.")
-
+# @app.on_event("startup")
+# def startup_event():
+#     """
+#     A startup event handler. It checks if the model was loaded correctly.
+#     If not, it prints a persistent warning.
+#     """
+#     if model is None:
+#         print("WARNING: Model is not loaded. Prediction endpoints will not work.")
+#
 
 @app.get("/health")
 def health_check():
@@ -94,6 +94,6 @@ def training_example():
     This can be used to test the prediction endpoints
     """
     df = pd.read_csv('IMDB Dataset.csv')
-    entry = random.rantint(2,len(df))
+    entry = random.randint(2,len(df))
 
     return {"review": df[entry]}
