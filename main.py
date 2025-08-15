@@ -19,8 +19,12 @@ except FileNotFoundError:
 
 
 class PredictionInput(BaseModel):
-    features: List[str]
+    text: str
+    true_sentiment: int = None
 
+class PredictionOutput(BaseModel):
+    text: str
+    confidence: float
 @app.get("/health")
 def health_check():
     """
@@ -75,12 +79,12 @@ def predict_with_probability(input_data: PredictionInput):
     }
 
 @app.get("/example")
-def training_example():
+async def training_example():
     """
     Training Example Endpoint
     Returns a random review from the original IMDB training dataset.
     This can be used to test the prediction endpoints
     """
-    df = pd.read_csv('IMDB Dataset.csv')
+    df = await pd.read_csv('IMDB Dataset.csv')
     entry = random.randint(2,len(df))
     return {"review": df.iat[entry,0]}
