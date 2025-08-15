@@ -84,4 +84,3 @@ def training_example():
     df = pd.read_csv('IMDB Dataset.csv')
     entry = random.randint(2,len(df))
     return {"review": df.iat[entry,0]}
-
