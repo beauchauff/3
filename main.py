@@ -2,7 +2,6 @@ import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
-from typing import List
 import random
 
 app = FastAPI(
@@ -14,24 +13,20 @@ try:
     print("Model loaded successfully.")
 except FileNotFoundError:
     print("Error: Model file 'sentiment_model.pkl' not found.")
-    print("Please run the 'train_model.py' script first to generate the model file.")
+    print("Please run the 'train_model.evaluate.py' script first to generate the model file.")
     model = None
 
 
 class PredictionInput(BaseModel):
     text: str
-    true_sentiment: int = None
 
-class PredictionOutput(BaseModel):
-    text: str
-    confidence: float
 @app.get("/health")
 def health_check():
     """
     Health Check Endpoint
     Simple endpoint to confirm that the API is running.
     """
-    return {"status": "ok"}
+    return {"status": "ok", "message": "API is running"}
 
 
 @app.post("/predict")
@@ -46,7 +41,7 @@ def predict(input_data: PredictionInput):
             detail="Model is not loaded. Cannot make predictions."
         )
 
-    review_text = input_data.features
+    review_text = input_data.text
     prediction = model.predict(review_text)
 
     return {"sentiment": prediction}
@@ -63,7 +58,7 @@ def predict_with_probability(input_data: PredictionInput):
             detail="Model is not loaded. Cannot make predictions."
         )
 
-    review_text = input_data.features
+    review_text = input_data.text
     prediction = model.predict(review_text)
 
     probabilities = model.predict_proba(review_text)
@@ -85,6 +80,6 @@ async def training_example():
     Returns a random review from the original IMDB training dataset.
     This can be used to test the prediction endpoints
     """
-    df = await pd.read_csv('IMDB Dataset.csv')
+    df = pd.read_csv('IMDB Dataset.csv')
     entry = random.randint(2,len(df))
     return {"review": df.iat[entry,0]}
