@@ -1,3 +1,4 @@
+import json
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException, status
@@ -42,7 +43,7 @@ def predict(input_data: PredictionInput):
         )
 
     review_text = input_data.text
-    prediction = model.predict(review_text)
+    prediction = model.predict([review_text])[0]
 
     return {"sentiment": prediction}
 
@@ -59,18 +60,13 @@ def predict_with_probability(input_data: PredictionInput):
         )
 
     review_text = input_data.text
-    prediction = model.predict(review_text)
-
-    probabilities = model.predict_proba(review_text)
-
-    # The probabilities for class 0 and class 1
-    prob_class_0 = probabilities[0][0]
-    prob_class_1 = probabilities[0][1]
+    prediction = model.predict([review_text])[0]
+    prediction_proba = model.predict_proba([review_text])[0]
 
     return {
-        "prediction": int(prediction[0]),
-        "probability_class_0": f"{prob_class_0:.4f}",
-        "probability_class_1": f"{prob_class_1:.4f}"
+        "prediction": prediction,
+        "negative_probability": prediction_proba[0],
+        "positive_probability": prediction_proba[1]
     }
 
 @app.get("/example")
